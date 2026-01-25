@@ -2,8 +2,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include <fstream>
-#include <sstream>
+#include "shader.cpp"
 
 void framebuffer_size_change(GLFWwindow *window, int width, int height)
 {
@@ -26,15 +25,6 @@ void processInput(GLFWwindow *window)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-}
-
-std::string loadFileAsString(std::string file)
-{
-	std::ifstream f(file);
-	std::stringstream s;
-	s << f.rdbuf();
-
-	return s.str();
 }
 
 int main()
@@ -62,8 +52,8 @@ int main()
 	glViewport(0, 0, 800, 800);
 
 	float vertices[] = {
-		-0.5, -0.3, 0, 0.f, 0.f, 1.f,
-		0, 0.4, 0, 0.f, 1.f, 0.f,
+		-0.5, -0.3, 0, 0.f, 1.f, 0.f,
+		0, 0.4, 0, 0.f, 0.f, 1.f,
 		0.5, -0.3, 0, 1.f, 0.f, 0.f};
 
 	unsigned int indices[]{
@@ -72,58 +62,7 @@ int main()
 		2,
 	};
 
-	std::string vertexFile = loadFileAsString("vertex.glsl");
-	const char *vertex = vertexFile.c_str();
-	// vertex shader
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(vertexShader, 1, &vertex, NULL);
-	glCompileShader(vertexShader);
-
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-				  << infoLog << std::endl;
-	}
-
-	std::string fragFile = loadFileAsString("frag.glsl");
-	const char *frag = fragFile.c_str();
-	unsigned int fragShader;
-	fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(fragShader, 1, &frag, NULL);
-	glCompileShader(fragShader);
-
-	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
-
-	if (!success)
-	{
-		glGetShaderInfoLog(fragShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAG::COMPILATION_FAILED\n"
-				  << infoLog << std::endl;
-	}
-	// Linking shader
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragShader);
-	glLinkProgram(shaderProgram);
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n"
-				  << infoLog << std::endl;
-	}
-
+	Shader shader("shaders/vertex.glsl", "shaders/frag.glsl");
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 
@@ -160,10 +99,10 @@ int main()
 
 		double time = glfwGetTime();
 		double green = (sin(time) + 1) / 2.;
-		auto uniformColor = glGetUniformLocation(shaderProgram, "ourColor");
 
-		glUseProgram(shaderProgram);
-		glUniform4f(uniformColor, 0.f, green, 1.f - green, 1.f);
+		shader.use();
+
+		shader.set4f("ourColor", 0.f, green, 1.f - green, 1.f);
 
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
