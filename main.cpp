@@ -2,9 +2,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "shader.cpp"
-#include "Image.cpp"
-#include "Vertex.cpp"
+#include "classes/shader.cpp"
+#include "classes/Image.cpp"
+#include "classes/Vertex.cpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void framebuffer_size_change(GLFWwindow *window, int width, int height)
 {
@@ -97,7 +100,7 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	Texture img("assets/star.jpg");
+	Texture img("assets/star.jpeg");
 	Texture img2("assets/image.jpg");
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_change);
@@ -120,6 +123,12 @@ int main()
 		shader.seti("OTHERTEXTURE", 1);
 		shader.seti("TIME", t);
 		t++;
+		glm::mat4 trans = glm::mat4(1.);
+		trans = glm::rotate(trans, glm::radians(t / 2.f), glm::vec3(0.f, 1.f, 0.f));
+		trans = glm::translate(trans, glm::vec3(0.f, 0.f, 0.5));
+
+		unsigned int transformID = glGetUniformLocation(shader.id, "transform");
+		glUniformMatrix4fv(transformID, 1, GL_FALSE, glm::value_ptr(trans));
 
 		img2.use(0);
 		img.use(1);
