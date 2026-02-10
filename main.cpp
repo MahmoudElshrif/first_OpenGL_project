@@ -9,9 +9,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-void framebuffer_size_change(GLFWwindow *window, int width, int height)
+int width = 800;
+int height = 800;
+void framebuffer_size_change(GLFWwindow *window, int w, int h)
 {
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, w, h);
+	width = w;
+	height = h;
 }
 
 void processInput(GLFWwindow *window)
@@ -38,7 +42,9 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	GLFWwindow *window = glfwCreateWindow(800, 800, "openglshit", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(width, height, "openglshit", NULL, NULL);
+
+	float fov = 45.;
 
 	if (window == NULL)
 	{
@@ -115,20 +121,24 @@ int main()
 		glClearColor(0., 0., 0., 1.);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		double time = glfwGetTime();
-		double green = (sin(time) + 1) / 2.;
-
 		shader.use();
 		shader.seti("TEXTURE", 0);
 		shader.seti("OTHERTEXTURE", 1);
 		shader.seti("TIME", t);
+
 		t++;
 		glm::mat4 trans = glm::mat4(1.);
 		trans = glm::rotate(trans, glm::radians(t / 2.f), glm::vec3(0.f, 1.f, 0.f));
-		trans = glm::translate(trans, glm::vec3(0.f, 0.f, 0.5));
+		trans = glm::translate(trans, glm::vec3(0.f, 0.f, 2.));
 
-		unsigned int transformID = glGetUniformLocation(shader.id, "transform");
-		glUniformMatrix4fv(transformID, 1, GL_FALSE, glm::value_ptr(trans));
+		glm::mat4 view = glm::mat4(1.);
+		view = glm::translate(view, glm::vec3(0., 0., -5.));
+
+		glm::mat4 proj = glm::perspective(glm::radians(fov), (float)width / (float)height, 0.1f, 100.f);
+
+		shader.setm4f("model", trans);
+		shader.setm4f("view", view);
+		shader.setm4f("projection", proj);
 
 		img2.use(0);
 		img.use(1);

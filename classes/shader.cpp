@@ -5,6 +5,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Shader
 {
@@ -100,4 +103,10 @@ public:
 
 		glUniform1f(uniformColor, val);
 	};
+
+	void setm4f(std::string name, glm::mat4 mat)
+	{
+		unsigned int matID = glGetUniformLocation(id, name.c_str());
+		glUniformMatrix4fv(matID, 1, GL_FALSE, glm::value_ptr(mat));
+	}
 };

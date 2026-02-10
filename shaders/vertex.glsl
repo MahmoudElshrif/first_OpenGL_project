@@ -7,14 +7,14 @@ out vec3 vertexColor;
 out vec2 TexCoord;
 
 uniform int TIME;
-uniform mat4 transform;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main() {
-
-	float ang = TIME / 100.;
-	mat2 rot = mat2(cos(ang), sin(ang), -sin(ang), cos(ang));
-	vec4 newpos = transform * vec4(aPos.x, aPos.y, aPos.z, 1.);
-	gl_Position = vec4(newpos.x, newpos.y, aPos.x, 1.0);
+	vec4 newpos = projection * view * model * vec4(aPos, 1.);
+	gl_Position = newpos;
 	vertexColor = aColor;
 	TexCoord = aTexCoord;
 }
