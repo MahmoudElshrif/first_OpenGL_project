@@ -1,20 +1,20 @@
 #pragma once
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <string>
 #include <GLFW/glfw3.h>
-#include <GLES3/gl3.h>
 #include <iostream>
 
-class Image
+class Texture
 {
 private:
+public:
 	int width, height, nrChannels;
 	unsigned char *data;
 	unsigned int texture;
-
-public:
-	Image(std::string path)
+	Texture(std::string path)
 	{
+		stbi_set_flip_vertically_on_load(true);
 		data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
 		glGenTextures(1, &texture);
@@ -23,6 +23,7 @@ public:
 
 		if (data)
 		{
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
@@ -32,5 +33,10 @@ public:
 		}
 
 		stbi_image_free(data);
+	}
+
+	void use()
+	{
+		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 };

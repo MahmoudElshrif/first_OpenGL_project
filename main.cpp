@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "shader.cpp"
+#include "Image.cpp"
+#include "Vertex.cpp"
 
 void framebuffer_size_change(GLFWwindow *window, int width, int height)
 {
@@ -51,15 +53,19 @@ int main()
 
 	glViewport(0, 0, 800, 800);
 
-	float vertices[] = {
-		-0.5, -0.3, 0, 0.f, 1.f, 0.f,
-		0, 0.4, 0, 0.f, 0.f, 1.f,
-		0.5, -0.3, 0, 1.f, 0.f, 0.f};
+	VertexDataArray vda(4);
+
+	vda[0] = {0.5, 0.5, 0, 0.f, 1.f, 0.f, 1.f, 1.f};
+	vda[1] = {0.5, -0.5, 0, 0.f, 0.f, 1.f, 1., 0.f};
+	vda[2] = {-0.5, -0.5, 0, 1.f, 0.f, 0.f, 0.f, 0.f};
+	vda[3] = {-0.5, 0.5, 0, 1.f, 0.f, 0.f, 0.f, 1.f};
+
+	float *vertices = vda.getArray();
 
 	unsigned int indices[]{
-		0,
-		1,
-		2,
+		0, 1, 2,
+		2, 3, 0
+
 	};
 
 	Shader shader("shaders/vertex.glsl", "shaders/frag.glsl");
@@ -75,18 +81,23 @@ int main()
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vda.get_size() * 8 * 4, vertices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
 	// Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	Texture img("assets/star.jpeg");
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_change);
 	while (!glfwWindowShouldClose(window))
@@ -104,6 +115,7 @@ int main()
 
 		shader.set4f("ourColor", 0.f, green, 1.f - green, 1.f);
 
+		glBindTexture(GL_TEXTURE_2D, img.texture);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
