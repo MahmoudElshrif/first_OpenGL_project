@@ -97,9 +97,13 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	Texture img("assets/star.jpeg");
+	Texture img("assets/star.jpg");
+	Texture img2("assets/image.jpg");
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_change);
+
+	int t = 0;
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// std::cout << "shitting fuck\n";
@@ -112,10 +116,13 @@ int main()
 		double green = (sin(time) + 1) / 2.;
 
 		shader.use();
+		shader.seti("TEXTURE", 0);
+		shader.seti("OTHERTEXTURE", 1);
+		shader.seti("TIME", t);
+		t++;
 
-		shader.set4f("ourColor", 0.f, green, 1.f - green, 1.f);
-
-		glBindTexture(GL_TEXTURE_2D, img.texture);
+		img2.use(0);
+		img.use(1);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

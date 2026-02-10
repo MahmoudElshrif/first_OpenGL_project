@@ -35,8 +35,9 @@ public:
 		stbi_image_free(data);
 	}
 
-	void use()
+	void use(int num = 0)
 	{
+		glActiveTexture(GL_TEXTURE0 + num);
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 };
