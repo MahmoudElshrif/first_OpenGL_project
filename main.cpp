@@ -2,13 +2,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "classes/shader.cpp"
-#include "classes/Image.cpp"
-#include "classes/Vertex.cpp"
+#include "classes/shader.hpp"
+#include "classes/Image.hpp"
+#include "classes/Vertex.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "classes/camera.cpp"
+#include "classes/camera.hpp"
 
 int width = 800;
 int height = 800;
@@ -166,8 +166,16 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		// std::cout << "shitting fuck\n";
 		processInput(window);
+		const float cameraSpeed = 0.05f; // adjust accordingly
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			cam.pos += cameraSpeed * cam.cameraDir;
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			cam.pos -= cameraSpeed * cam.cameraDir;
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			cam.pos -= glm::normalize(glm::cross(cam.cameraDir, cam.cameraUp)) * cameraSpeed;
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			cam.pos += glm::normalize(glm::cross(cam.cameraDir, cam.cameraUp)) * cameraSpeed;
 
 		glClearColor(0., 0., 0., 1.);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -178,13 +186,9 @@ int main()
 		shader.seti("TIME", t);
 
 		t++;
-		float radius = 5.;
-		float camX = sin(t / 100.) * radius;
-		float camZ = cos(t / 100.) * radius;
-		cam.pos = glm::vec3(camX, 0.f, camZ);
 
 		cam.lookAt(glm::vec3(0.f, 0.f, 0.f));
-		glm::mat4 view = cam.view;
+		glm::mat4 view = cam.getViewMatrix();
 
 		glm::mat4 proj = cam.getProjectionMatrix(width, height);
 
