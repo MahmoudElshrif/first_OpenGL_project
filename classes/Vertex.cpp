@@ -1,8 +1,6 @@
-#include <iostream>
 struct VertexData
 {
 	float pos[3];
-	float color[3];
 	float texCord[2];
 };
 
@@ -25,18 +23,15 @@ public:
 
 	float *getArray() const
 	{
-		float *arr = new float[8 * size];
+		float *arr = new float[5 * size];
 		for (int i = 0; i < size; i++)
 		{
-			int ind = i * 8;
+			int ind = i * 5;
 			arr[ind + 0] = vertices[i].pos[0];
 			arr[ind + 1] = vertices[i].pos[1];
 			arr[ind + 2] = vertices[i].pos[2];
-			arr[ind + 3] = vertices[i].color[0];
-			arr[ind + 4] = vertices[i].color[1];
-			arr[ind + 5] = vertices[i].color[2];
-			arr[ind + 6] = vertices[i].texCord[0];
-			arr[ind + 7] = vertices[i].texCord[1];
+			arr[ind + 3] = vertices[i].texCord[0];
+			arr[ind + 4] = vertices[i].texCord[1];
 		}
 
 		return arr;
