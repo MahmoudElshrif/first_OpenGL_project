@@ -5,17 +5,20 @@
 #include "Mouse.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
+#include <algorithm>
 class Camera
 {
 public:
 	float fov = 45.f;
 	float near = 0.1f;
 	float far = 100.f;
-	float camsens = 0.1;
+	float camsens = 0.006;
 
 	glm::vec3 pos = glm::vec3(0.f);
 	glm::vec3 cameraDir = glm::vec3(0.f, 0.f, -1.f);
 	glm::vec3 cameraUp = glm::vec3(0.f, 1.f, 0.f);
+
+	glm::vec3 camRot = glm::vec3(0.f, 0.f, 0.f);
 
 	void lookAt(glm::vec3 target)
 	{
@@ -45,8 +48,15 @@ public:
 			pos -= glm::normalize(glm::cross(cameraDir, cameraUp)) * cameraSpeed;
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			pos += glm::normalize(glm::cross(cameraDir, cameraUp)) * cameraSpeed;
-		cameraDir = glm::rotate(cameraDir, -glm::radians((float)Mouse::deltax * camsens), cameraUp);
+
+		camRot.x += (float)Mouse::deltax * camsens;
+		camRot.y += (float)Mouse::deltay * camsens;
+
+		camRot.y = std::min(std::max(-3.14f / 2.f + 0.3f, camRot.y), 3.14f / 2.f - 0.3f);
+
+		cameraDir = glm::vec3(0., 0., -1.);
+		cameraDir = glm::rotate(cameraDir, -(camRot.x), cameraUp);
 		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDir, cameraUp));
-		cameraDir = glm::rotate(cameraDir, -glm::radians((float)Mouse::deltay * camsens), cameraRight);
+		cameraDir = glm::rotate(cameraDir, -(camRot.y), cameraRight);
 	}
 };
