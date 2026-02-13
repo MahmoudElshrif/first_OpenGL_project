@@ -124,7 +124,7 @@ int main()
 		// Top face
 		20, 21, 22, 22, 23, 20};
 
-	Shader shader("shaders/vertex.glsl", "shaders/frag.glsl");
+	Shader shader("shaders/vertex.vert", "shaders/frag.frag");
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 

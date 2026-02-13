@@ -39,6 +39,15 @@ public:
 
 	void handleInputs(GLFWwindow *window)
 	{
+		camRot.x += (float)Mouse::deltax * camsens;
+		camRot.y += (float)Mouse::deltay * camsens;
+
+		camRot.y = std::min(std::max(-3.14f / 2.f + 0.3f, camRot.y), 3.14f / 2.f - 0.3f);
+
+		cameraDir = glm::vec3(0., 0., -1.);
+		cameraDir = glm::rotate(cameraDir, -(camRot.x), cameraUp);
+
+		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDir, cameraUp));
 		const float cameraSpeed = 0.05f;
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 			pos += cameraSpeed * cameraDir;
@@ -49,14 +58,6 @@ public:
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			pos += glm::normalize(glm::cross(cameraDir, cameraUp)) * cameraSpeed;
 
-		camRot.x += (float)Mouse::deltax * camsens;
-		camRot.y += (float)Mouse::deltay * camsens;
-
-		camRot.y = std::min(std::max(-3.14f / 2.f + 0.3f, camRot.y), 3.14f / 2.f - 0.3f);
-
-		cameraDir = glm::vec3(0., 0., -1.);
-		cameraDir = glm::rotate(cameraDir, -(camRot.x), cameraUp);
-		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDir, cameraUp));
 		cameraDir = glm::rotate(cameraDir, -(camRot.y), cameraRight);
 	}
 };
