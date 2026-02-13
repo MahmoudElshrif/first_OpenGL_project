@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "classes/camera.hpp"
+#include "classes/Mouse.hpp"
 
 int width = 800;
 int height = 800;
@@ -59,6 +60,8 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwShowWindow(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -152,7 +155,7 @@ int main()
 	Texture img2("assets/image.jpg");
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_change);
-
+	glfwSetCursorPosCallback(window, Mouse::mouse_move_callback);
 	int t = 0;
 
 	glm::vec3 poses[] = {
@@ -167,15 +170,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-		const float cameraSpeed = 0.05f; // adjust accordingly
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			cam.pos += cameraSpeed * cam.cameraDir;
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			cam.pos -= cameraSpeed * cam.cameraDir;
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			cam.pos -= glm::normalize(glm::cross(cam.cameraDir, cam.cameraUp)) * cameraSpeed;
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			cam.pos += glm::normalize(glm::cross(cam.cameraDir, cam.cameraUp)) * cameraSpeed;
+		cam.handleInputs(window);
 
 		glClearColor(0., 0., 0., 1.);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -187,7 +182,7 @@ int main()
 
 		t++;
 
-		cam.lookAt(glm::vec3(0.f, 0.f, 0.f));
+		// cam.lookAt(glm::vec3(0.f, 0.f, 0.f));
 		glm::mat4 view = cam.getViewMatrix();
 
 		glm::mat4 proj = cam.getProjectionMatrix(width, height);
@@ -209,6 +204,8 @@ int main()
 		// trans = glm::rotate(trans, glm::radians(t / 2.f), glm::vec3(0.f, 1.f, 0.f));
 		// trans = glm::rotate(trans, glm::radians(t / 1.f), glm::vec3(1.f, 1.f, 0.f));
 
+		Mouse::deltax = 0.;
+		Mouse::deltay = 0.;
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
