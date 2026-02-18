@@ -48,7 +48,9 @@ public:
 		cameraDir = glm::rotate(cameraDir, -(camRot.x), cameraUp);
 
 		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDir, cameraUp));
-		const float cameraSpeed = 0.05f;
+		float cameraSpeed = 0.05f;
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			cameraSpeed *= 2.;
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 			pos += cameraSpeed * cameraDir;
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -57,6 +59,10 @@ public:
 			pos -= glm::normalize(glm::cross(cameraDir, cameraUp)) * cameraSpeed;
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			pos += glm::normalize(glm::cross(cameraDir, cameraUp)) * cameraSpeed;
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+			pos += cameraUp * cameraSpeed;
+		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+			pos += -cameraUp * cameraSpeed;
 
 		cameraDir = glm::rotate(cameraDir, -(camRot.y), cameraRight);
 	}
