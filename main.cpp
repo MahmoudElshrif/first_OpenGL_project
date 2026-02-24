@@ -132,8 +132,12 @@ int main()
 	glGenBuffers(1, &EBO);
 
 	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
+	unsigned int lightVAO;
 
+	glGenVertexArrays(1, &VAO);
+	glGenVertexArrays(1, &lightVAO);
+
+	// normal VAO
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -148,6 +152,13 @@ int main()
 
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	// light VAO
+	glBindVertexArray(lightVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+	glEnableVertexAttribArray(0);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -176,8 +187,8 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.use();
-		shader.seti("TEXTURE", 0);
-		shader.seti("OTHERTEXTURE", 1);
+		shader.set4f("objectColor", 0.f, 1.f, 0.3, 1.f);
+		shader.set4f("lightColor", 1., 1.f, 1.f, 1.f);
 		shader.seti("TIME", t);
 
 		t++;
@@ -186,9 +197,6 @@ int main()
 		glm::mat4 view = cam.getViewMatrix();
 
 		glm::mat4 proj = cam.getProjectionMatrix(width, height);
-
-		img.use(0);
-		img2.use(1);
 
 		for (auto i : poses)
 		{

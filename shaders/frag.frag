@@ -4,10 +4,10 @@ out vec4 FragColor;
 
 in vec2 TexCoord;
 
-uniform sampler2D TEXTURE;
-uniform sampler2D OTHERTEXTURE;
+uniform vec4 objectColor;
+uniform vec4 lightColor;
 uniform int TIME;
 
 void main() {
-	FragColor = texture(TEXTURE, TexCoord);
+	FragColor = objectColor * lightColor;
 }
