@@ -42,6 +42,11 @@ public:
 		return size;
 	}
 
+	int get_total_size()
+	{
+		return size * sizeof(VertexData);
+	}
+
 	~VertexDataArray()
 	{
 		delete[] vertices;

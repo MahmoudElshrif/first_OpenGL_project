@@ -125,6 +125,7 @@ int main()
 		20, 21, 22, 22, 23, 20};
 
 	Shader shader("shaders/vertex.vert", "shaders/frag.frag");
+	Shader lightShader("shaders/light/lightvertex.vert", "shaders/light/lightfrag.frag");
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 
@@ -141,7 +142,7 @@ int main()
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vda.get_size() * 5 * 4, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vda.get_total_size(), vertices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -157,6 +158,11 @@ int main()
 	glBindVertexArray(lightVAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vda.get_size() * 5 * 4, vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
@@ -171,10 +177,10 @@ int main()
 
 	glm::vec3 poses[] = {
 		glm::vec3(0., 0., 0.),
-		glm::vec3(10., 3., 0.),
-		glm::vec3(-2.2, 1.5, -1.),
-		glm::vec3(0., -3., 0.),
-		glm::vec3(0., 3., 3.),
+		// glm::vec3(10., 3., 0.),
+		// glm::vec3(-2.2, 1.5, -1.),
+		// glm::vec3(0., -3., 0.),
+		// glm::vec3(0., 3., 3.),
 
 	};
 
@@ -198,19 +204,28 @@ int main()
 
 		glm::mat4 proj = cam.getProjectionMatrix(width, height);
 
+		shader.setm4f("view", view);
+		shader.setm4f("projection", proj);
+		glBindVertexArray(VAO);
 		for (auto i : poses)
 		{
 			glm::mat4 trans = glm::mat4(1.);
 			trans = glm::translate(trans, i);
 			shader.setm4f("model", trans);
-			shader.setm4f("view", view);
-			shader.setm4f("projection", proj);
-			glBindVertexArray(VAO);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		}
-		// trans = glm::translate(trans, glm::vec3(0.f, 0.f, 1.5));
-		// trans = glm::rotate(trans, glm::radians(t / 2.f), glm::vec3(0.f, 1.f, 0.f));
-		// trans = glm::rotate(trans, glm::radians(t / 1.f), glm::vec3(1.f, 1.f, 0.f));
+
+		lightShader.use();
+		lightShader.setm4f("view", view);
+		lightShader.setm4f("projection", proj);
+
+		glm::mat4 lightCube = glm::mat4(1.);
+		lightCube = glm::translate(lightCube, glm::vec3(2., 1., -0.5));
+		lightCube = glm::scale(lightCube, glm::vec3(1.));
+		lightShader.setm4f("model", lightCube);
+
+		glBindVertexArray(lightVAO);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 		Mouse::deltax = 0.;
 		Mouse::deltay = 0.;
