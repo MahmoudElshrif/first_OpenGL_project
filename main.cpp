@@ -87,7 +87,7 @@ int main()
 	int t = 0;
 
 	glm::vec3 poses[] = {
-		glm::vec3(0., 0., 0.),
+		glm::vec3(0., 0., 3.),
 		// glm::vec3(10., 3., 0.),
 		// glm::vec3(-2.2, 1.5, -1.),
 		// glm::vec3(0., -3., 0.),
@@ -133,6 +133,9 @@ int main()
 			i.draw();
 		}
 
+		lightShader.use();
+		lightShader.setm4f("view", view);
+		lightShader.setm4f("projection", proj);
 		lightSource.draw();
 
 		Mouse::deltax = 0.;
