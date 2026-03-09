@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "classes/camera.hpp"
 #include "classes/Mouse.hpp"
+#include "classes/models/modelRenderer.hpp"
 
 int width = 800;
 int height = 800;
@@ -70,101 +71,11 @@ int main()
 
 	glViewport(0, 0, 800, 800);
 
-	VertexDataArray vda(24);
-
-	// Back face (Z = -0.5)
-	vda[0] = {-0.5f, -0.5f, -0.5f, 0.0f, 0.0f}; // Bottom-Left
-	vda[1] = {0.5f, -0.5f, -0.5f, 1.0f, 0.0f};	// Bottom-Right
-	vda[2] = {0.5f, 0.5f, -0.5f, 1.0f, 1.0f};	// Top-Right
-	vda[3] = {-0.5f, 0.5f, -0.5f, 0.0f, 1.0f};	// Top-Left
-
-	// Front face (Z = 0.5)
-	vda[4] = {-0.5f, -0.5f, 0.5f, 0.0f, 0.0f};
-	vda[5] = {0.5f, -0.5f, 0.5f, 1.0f, 0.0f};
-	vda[6] = {0.5f, 0.5f, 0.5f, 1.0f, 1.0f};
-	vda[7] = {-0.5f, 0.5f, 0.5f, 0.0f, 1.0f};
-
-	// Left face (X = -0.5)
-	vda[8] = {-0.5f, 0.5f, 0.5f, 1.0f, 0.0f};
-	vda[9] = {-0.5f, 0.5f, -0.5f, 1.0f, 1.0f};
-	vda[10] = {-0.5f, -0.5f, -0.5f, 0.0f, 1.0f};
-	vda[11] = {-0.5f, -0.5f, 0.5f, 0.0f, 0.0f};
-
-	// Right face (X = 0.5)
-	vda[12] = {0.5f, 0.5f, 0.5f, 1.0f, 0.0f};
-	vda[13] = {0.5f, 0.5f, -0.5f, 1.0f, 1.0f};
-	vda[14] = {0.5f, -0.5f, -0.5f, 0.0f, 1.0f};
-	vda[15] = {0.5f, -0.5f, 0.5f, 0.0f, 0.0f};
-
-	// Bottom face (Y = -0.5)
-	vda[16] = {-0.5f, -0.5f, -0.5f, 0.0f, 1.0f};
-	vda[17] = {0.5f, -0.5f, -0.5f, 1.0f, 1.0f};
-	vda[18] = {0.5f, -0.5f, 0.5f, 1.0f, 0.0f};
-	vda[19] = {-0.5f, -0.5f, 0.5f, 0.0f, 0.0f};
-
-	// Top face (Y = 0.5)
-	vda[20] = {-0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
-	vda[21] = {0.5f, 0.5f, -0.5f, 1.0f, 1.0f};
-	vda[22] = {0.5f, 0.5f, 0.5f, 1.0f, 0.0f};
-	vda[23] = {-0.5f, 0.5f, 0.5f, 0.0f, 0.0f};
-
-	float *vertices = vda.getArray();
-
-	unsigned int indices[] = {
-		// Back face
-		0, 1, 2, 2, 3, 0,
-		// Front face
-		4, 5, 6, 6, 7, 4,
-		// Left face
-		8, 9, 10, 10, 11, 8,
-		// Right face
-		12, 13, 14, 14, 15, 12,
-		// Bottom face
-		16, 17, 18, 18, 19, 16,
-		// Top face
-		20, 21, 22, 22, 23, 20};
-
 	Shader shader("shaders/vertex.vert", "shaders/frag.frag");
 	Shader lightShader("shaders/light/lightvertex.vert", "shaders/light/lightfrag.frag");
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
 
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-
-	unsigned int VAO;
-	unsigned int lightVAO;
-
-	glGenVertexArrays(1, &VAO);
-	glGenVertexArrays(1, &lightVAO);
-
-	// normal VAO
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vda.get_total_size(), vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// Position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	// light VAO
-	glBindVertexArray(lightVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vda.get_size() * 5 * 4, vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-	glEnableVertexAttribArray(0);
+	ModelRenderer lightSource;
+	lightSource.shader = &lightShader;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -184,6 +95,17 @@ int main()
 
 	};
 
+	std::vector<ModelRenderer> cubes;
+	for (auto i : poses)
+	{
+		ModelRenderer cube;
+		cube.pos = i;
+		cube.shader = &shader;
+		cubes.push_back(cube);
+	}
+
+	lightSource.pos = glm::vec3(2., 1., -0.5);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -193,7 +115,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.use();
-		shader.set4f("objectColor", 0.f, 1.f, 0.3, 1.f);
+		shader.set4f("objectColor", 1.f, 1.f, 0.3, 1.f);
 		shader.set4f("lightColor", 1., 1.f, 1.f, 1.f);
 		shader.seti("TIME", t);
 
@@ -206,26 +128,12 @@ int main()
 
 		shader.setm4f("view", view);
 		shader.setm4f("projection", proj);
-		glBindVertexArray(VAO);
-		for (auto i : poses)
+		for (auto i : cubes)
 		{
-			glm::mat4 trans = glm::mat4(1.);
-			trans = glm::translate(trans, i);
-			shader.setm4f("model", trans);
-			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+			i.draw();
 		}
 
-		lightShader.use();
-		lightShader.setm4f("view", view);
-		lightShader.setm4f("projection", proj);
-
-		glm::mat4 lightCube = glm::mat4(1.);
-		lightCube = glm::translate(lightCube, glm::vec3(2., 1., -0.5));
-		lightCube = glm::scale(lightCube, glm::vec3(1.));
-		lightShader.setm4f("model", lightCube);
-
-		glBindVertexArray(lightVAO);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		lightSource.draw();
 
 		Mouse::deltax = 0.;
 		Mouse::deltay = 0.;

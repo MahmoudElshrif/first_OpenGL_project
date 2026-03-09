@@ -1,3 +1,4 @@
+#pragma once
 struct VertexData
 {
 	float pos[3];
