@@ -9,6 +9,7 @@ uniform sampler2D TEXTURE;
 uniform vec4 objectColor;
 uniform vec4 lightColor;
 uniform vec3 lightPos;
+uniform vec3 viewPos;
 uniform int TIME;
 
 void main() {
@@ -21,5 +22,12 @@ void main() {
 
 	vec4 diffcolor = lightColor * diff;
 
-	FragColor = objectColor * (ambientcolor + diffcolor);
+	float specstrength = 0.5;
+	vec3 viewDir = normalize(viewPos - FragPos);
+	vec3 reflectDir = reflect(-lightdir, Normal);
+
+	float spec = pow(max(dot(viewDir, reflectDir), 0.), 32.);
+	vec4 specular = specstrength * spec * lightColor;
+
+	FragColor = objectColor * (ambientcolor + diffcolor + specular);
 }

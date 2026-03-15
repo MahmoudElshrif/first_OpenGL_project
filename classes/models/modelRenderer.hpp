@@ -24,6 +24,9 @@ public:
 	void draw()
 	{
 		modelMat = glm::mat4(1.);
+		modelMat = glm::rotate(modelMat, rot.z, glm::vec3(0., 0., 1.));
+		modelMat = glm::rotate(modelMat, rot.y, glm::vec3(0., 1., 0.));
+		modelMat = glm::rotate(modelMat, rot.x, glm::vec3(1., 0., 0.));
 		modelMat = glm::translate(modelMat, pos);
 		modelMat = glm::scale(modelMat, scale);
 		model->use();

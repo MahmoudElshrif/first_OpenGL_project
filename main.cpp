@@ -106,6 +106,7 @@ int main()
 
 	lightSource.pos = glm::vec3(2., 0., -0.5);
 
+	lightSource.scale = glm::vec3(0.3);
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -117,12 +118,14 @@ int main()
 		shader.use();
 		shader.set4f("objectColor", 1.f, 1.f, 0.3, 1.f);
 		shader.set4f("lightColor", 1., 1.f, 1.f, 1.f);
-		shader.seti("TIME", t);
+		shader.set3f("viewPos", cam.pos.x, cam.pos.y, cam.pos.z);
 		shader.set3f("lightPos", lightSource.pos.x, lightSource.pos.y, lightSource.pos.z);
+		shader.seti("TIME", t);
 		t++;
 
-		lightSource.pos.x = cos(t * 0.1) * 5;
-		lightSource.pos.z = sin(t * 0.1) * 5;
+		lightSource.pos.x = cos(t * 0.01) * 5;
+		lightSource.pos.z = sin(t * 0.01) * 5;
+		lightSource.pos.y = cos(t * 0.03) * 5;
 
 		// cam.lookAt(glm::vec3(0.f, 0.f, 0.f));
 		glm::mat4 view = cam.getViewMatrix();
