@@ -51,7 +51,7 @@ int main()
 	Camera cam;
 	cam.pos = glm::vec3(0., 0., 5.f);
 
-	float fov = 45.;
+	float fov = 10.;
 
 	if (window == NULL)
 	{
@@ -87,7 +87,7 @@ int main()
 	int t = 0;
 
 	glm::vec3 poses[] = {
-		glm::vec3(0., 0., 3.),
+		glm::vec3(0., 0., 0.),
 		// glm::vec3(10., 3., 0.),
 		// glm::vec3(-2.2, 1.5, -1.),
 		// glm::vec3(0., -3., 0.),
@@ -104,7 +104,7 @@ int main()
 		cubes.push_back(cube);
 	}
 
-	lightSource.pos = glm::vec3(2., 1., -0.5);
+	lightSource.pos = glm::vec3(2., 0., -0.5);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -118,8 +118,11 @@ int main()
 		shader.set4f("objectColor", 1.f, 1.f, 0.3, 1.f);
 		shader.set4f("lightColor", 1., 1.f, 1.f, 1.f);
 		shader.seti("TIME", t);
-
+		shader.set3f("lightPos", lightSource.pos.x, lightSource.pos.y, lightSource.pos.z);
 		t++;
+
+		lightSource.pos.x = cos(t * 0.1) * 5;
+		lightSource.pos.z = sin(t * 0.1) * 5;
 
 		// cam.lookAt(glm::vec3(0.f, 0.f, 0.f));
 		glm::mat4 view = cam.getViewMatrix();

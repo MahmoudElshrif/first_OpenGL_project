@@ -29,6 +29,7 @@ public:
 		model->use();
 		shader->use();
 		shader->setm4f("model", modelMat);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		// glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 };
