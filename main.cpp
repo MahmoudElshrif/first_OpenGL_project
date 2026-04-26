@@ -117,9 +117,16 @@ int main()
 
 		shader.use();
 		shader.set4f("objectColor", 1.f, 1.f, 0.3, 1.f);
-		shader.set4f("lightColor", 1., 1.f, 1.f, 1.f);
+		shader.set3f("material.ambient", 1.0f, 0.5f, 0.31f);
+		shader.set3f("material.diffuse", 1.0f, 0.5f, 0.31f);
+		shader.set3f("material.specular", 0.5f, 0.5f, 0.5f);
+		shader.setf("material.shininess", 32.0f);
+
 		shader.set3f("viewPos", cam.pos.x, cam.pos.y, cam.pos.z);
-		shader.set3f("lightPos", lightSource.pos.x, lightSource.pos.y, lightSource.pos.z);
+		shader.set3f("light.ambient", 0.2f, 0.2f, 0.2f);
+		shader.set3f("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+		shader.set3f("light.specular", 1.0f, 1.0f, 1.0f);
+		shader.set3f("light.pos", lightSource.pos.x, lightSource.pos.y, lightSource.pos.z);
 		shader.seti("TIME", t);
 		t++;
 
